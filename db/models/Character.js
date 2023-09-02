@@ -124,6 +124,12 @@ Character.init({
             model: sequelize.models.World,
             key: 'id'
         }
+    },
+    userId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: sequelize.models.User
+        }
     }
 },
 {

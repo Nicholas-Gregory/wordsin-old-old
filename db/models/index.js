@@ -29,6 +29,10 @@ const EquipmentHasEnchantment = require('./EquipmentHasEnchantment');
 const World = require('./World');
 const LinkInWorld = require('./LinkInWorld');
 const StateChange = require('./StateChange');
+const User = require('./User');
+
+User.hasMany(Character, { foreignKey: 'userId' });
+Character.belongsTo(User, { foreignKey: 'userId' });
 
 Character.hasOne(ItemInventory, { foreignKey: 'characterId' });
 ItemInventory.belongsTo(Character, { foreignKey: 'characterId' });
