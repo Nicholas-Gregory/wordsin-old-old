@@ -3,8 +3,10 @@ const { graphqlHTTP } = require('express-graphql');
 const {
     GraphQLSchema,
     GraphQLObjectType,
-    GraphQLString
+    GraphQLList
 } = require('graphql')
+
+const { user } = require('./graphqltypes');
 
 const sequelize = require('./db/connection');
 const models = require('./db/models');
@@ -15,11 +17,11 @@ const EXPRESS_PORT = 5000;
 
 const schema = new GraphQLSchema({
     query: new GraphQLObjectType({
-        name: 'root',
+        name: 'rootQuery',
         fields: () => ({
-            use: { 
-                type: GraphQLString,
-                resolve: () => "Working"
+            user: {
+                type: new GraphQLList(user),
+                resolve: async () => await models.User.findAll({})
             }
         })
     })
@@ -31,5 +33,20 @@ app.use('/api', graphqlHTTP({
 }));
 
 sequelize.sync({ force: true }).then(async () => {
+    const user1 = await models.User.create({
+        userName: "test",
+        password: "test1234",
+        email: "test@test.com"
+    });
+    const user2 = await models.User.create({
+        userName: "user2",
+        password: "password123",
+        email: "user2@test.com"
+    });
+    const character = await models.Character.create({
+        name: "george",
+        userId: user2.id
+    });
+    
     app.listen(EXPRESS_PORT, () => console.log(`Express server listening on port ${EXPRESS_PORT}`));
 });

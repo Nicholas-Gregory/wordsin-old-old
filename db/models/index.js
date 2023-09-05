@@ -199,7 +199,7 @@ AffectToAdvance.hasMany(StateChange, { foreignKey: 'advanceId' });
 StateChange.belongsTo(AffectToAdvance, { foreignKey: 'advanceId' });
 
 module.exports = {
-    Character, 
+    User, Character, 
     ItemInventory, Item,
     Keyword, Effect, EffectWord,
     Spell, Grimoire, GrimoireInventory,
