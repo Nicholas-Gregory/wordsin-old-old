@@ -6,7 +6,7 @@ const {
     GraphQLList
 } = require('graphql')
 
-const { user } = require('./graphqltypes');
+const { user, character, storylet } = require('./graphqltypes');
 
 const sequelize = require('./db/connection');
 const models = require('./db/models');
@@ -19,9 +19,17 @@ const schema = new GraphQLSchema({
     query: new GraphQLObjectType({
         name: 'rootQuery',
         fields: () => ({
-            user: {
+            users: {
                 type: new GraphQLList(user),
                 resolve: async () => await models.User.findAll({})
+            },
+            characters: {
+                type: new GraphQLList(character),
+                resolve: async () => await models.Character.findAll({})
+            },
+            storylets: {
+                type: new GraphQLList(storylet),
+                resolve: async () => await models.Storylet.findAll({})
             }
         })
     })
@@ -33,20 +41,20 @@ app.use('/api', graphqlHTTP({
 }));
 
 sequelize.sync({ force: true }).then(async () => {
-    const user1 = await models.User.create({
-        userName: "test",
-        password: "test1234",
-        email: "test@test.com"
+    const keyword = await models.Keyword.create({
+        word: 'open'
+    })
+    const affect = await models.Affect.create({
+        requirement: 1
     });
-    const user2 = await models.User.create({
-        userName: "user2",
-        password: "password123",
-        email: "user2@test.com"
+    affect.associateKeyword(keyword);
+    const storylet1 = await models.Storylet.create({
+        body: "You see a chair"
     });
-    const character = await models.Character.create({
-        name: "george",
-        userId: user2.id
+    const storylet2 = await models.Storylet.create({
+        body: "The chair is red"
     });
-    
+    await storylet1.link(storylet2, [affect]);
+
     app.listen(EXPRESS_PORT, () => console.log(`Express server listening on port ${EXPRESS_PORT}`));
 });
