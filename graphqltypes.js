@@ -62,6 +62,27 @@ const storylet = new GraphQLObjectType({
     })
 });
 
+const keyword = new GraphQLObjectType({
+    name: 'keyword',
+    fields: () => ({
+        id: { type: GraphQLInt },
+        word: { type: GraphQLString }
+    })
+});
+
+const affect = new GraphQLObjectType({
+    name: 'affect',
+    fields: () => ({
+        id: { type: GraphQLInt },
+        requirement: { type: GraphQLInt },
+        keyword: {
+            type: keyword,
+            resolve: async affect => await (await models.Affect.findByPk(affect.id)).getKeyword()
+        }
+    })
+});
+
 module.exports = {
-    user, character, storylet
+    user, character, storylet,
+    keyword, affect
 }

@@ -3,10 +3,13 @@ const { graphqlHTTP } = require('express-graphql');
 const {
     GraphQLSchema,
     GraphQLObjectType,
-    GraphQLList
+    GraphQLList,
+    GraphQLString,
+    GraphQLNonNull,
+    GraphQLInt
 } = require('graphql')
 
-const { user, character, storylet } = require('./graphqltypes');
+const qlTypes = require('./graphqltypes');
 
 const sequelize = require('./db/connection');
 const models = require('./db/models');
@@ -20,16 +23,53 @@ const schema = new GraphQLSchema({
         name: 'rootQuery',
         fields: () => ({
             users: {
-                type: new GraphQLList(user),
+                type: new GraphQLList(qlTypes.user),
                 resolve: async () => await models.User.findAll({})
             },
             characters: {
-                type: new GraphQLList(character),
+                type: new GraphQLList(qlTypes.character),
                 resolve: async () => await models.Character.findAll({})
             },
             storylets: {
-                type: new GraphQLList(storylet),
+                type: new GraphQLList(qlTypes.storylet),
                 resolve: async () => await models.Storylet.findAll({})
+            },
+            keywords: {
+                type: new GraphQLList(qlTypes.keyword),
+                resolve: async () => await models.Keyword.findAll({})
+            },
+            affect: {
+                type: new GraphQLList(qlTypes.affect),
+                resolve: async () => await models.Affect.findAll({})
+            }
+        })
+    }),
+    mutation: new GraphQLObjectType({
+        name: 'rootMutation',
+        fields: () => ({
+            addUser: {
+                type: qlTypes.user,
+                args: {
+                    userName: { type: new GraphQLNonNull(GraphQLString) },
+                    email: { type: new GraphQLNonNull(GraphQLString) },
+                    password: { type: new GraphQLNonNull(GraphQLString) }
+                },
+                resolve: async (_, args) => await models.User.create({
+                    userName: args.userName,
+                    email: args.email,
+                    password: args.password
+                })
+            },
+            addCharacter: {
+                type: qlTypes.character,
+                args: {
+                    name: { type: new GraphQLNonNull(GraphQLString) },
+                    userId: { type: GraphQLInt }
+                },
+                resolve: async (_, args) => await models.Character.create({
+                        name: args.name,
+                        userId: args.userId
+                })
             }
         })
     })
