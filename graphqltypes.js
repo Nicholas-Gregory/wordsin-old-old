@@ -117,11 +117,29 @@ const modifier = new GraphQLObjectType({
             resolve: async modifier => await (await models.Modifier.findByPk(modifier.id)).getKeyword()
         }
     })
-})
+});
+
+const equipment = new GraphQLObjectType({
+    name: 'equipment',
+    fields: () => ({
+        id: { type: GraphQLInt },
+        name: { type: GraphQLString },
+        description: { type: GraphQLString },
+        type: { type: GraphQLString },
+        effect: {
+            type: effect,
+            resolve: async equipment => await (await models.Equipment.findByPk(equipment.id)).getEffect()
+        },
+        modifiers: { 
+            type: new GraphQLList(modifier),
+            resolve: async equipment => await (await models.Equipment.findByPk(equipment.id)).getModifiers()
+        }
+    })
+});
 
 module.exports = {
     user, character, storylet,
     keyword, affect, effect,
     item,
-    modifier
+    modifier, equipment
 }

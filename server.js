@@ -54,6 +54,10 @@ const schema = new GraphQLSchema({
             modifiers: {
                 type: new GraphQLList(qlTypes.modifier),
                 resolve: async () => await models.Modifier.findAll({})
+            },
+            equipment: {
+                type: new GraphQLList(qlTypes.equipment),
+                resolve: async () => await models.Equipment.findAll({})
             }
         })
     }),
@@ -183,6 +187,33 @@ const schema = new GraphQLSchema({
                         amount: args.amount,
                         keywordId: args.keywordId
                 })
+            },
+            addEquipment: {
+                type: qlTypes.equipment,
+                args: {
+                    name: { type: new GraphQLNonNull(GraphQLString) },
+                    description: { type: new GraphQLNonNull(GraphQLString) },
+                    type: { type: GraphQLString },
+                    effectId: { type: GraphQLInt },
+                    modifiers: { type: new GraphQLList(GraphQLInt) }
+                },
+                resolve: async (_, args) => {
+                    const equipment = await models.Equipment.create({
+                        name: args.name,
+                        description: args.description,
+                        type: args.type,
+                        effectId: args.effectId
+                    });
+
+                    for (let id of args.modifiers) {
+                        await models.EquipmentHasModifier.create({
+                            equipmentId: equipment.id,
+                            modifierId: id
+                        });
+                    }
+
+                    return equipment;
+                }
             }
         })
     })
