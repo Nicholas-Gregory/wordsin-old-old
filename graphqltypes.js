@@ -105,10 +105,23 @@ const item = new GraphQLObjectType({
             resolve: async item => await (await models.Item.findByPk(item.id)).getEffect()
         }
     })
+});
+
+const modifier = new GraphQLObjectType({
+    name: 'modifier',
+    fields: () => ({
+        id: { type: GraphQLInt },
+        amount: { type: GraphQLInt },
+        keyword: {
+            type: keyword,
+            resolve: async modifier => await (await models.Modifier.findByPk(modifier.id)).getKeyword()
+        }
+    })
 })
 
 module.exports = {
     user, character, storylet,
     keyword, affect, effect,
-    item
+    item,
+    modifier
 }

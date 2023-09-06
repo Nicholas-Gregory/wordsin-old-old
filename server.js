@@ -50,6 +50,10 @@ const schema = new GraphQLSchema({
             items: {
                 type: new GraphQLList(qlTypes.item),
                 resolve: async () => await models.Item.findAll({})
+            },
+            modifiers: {
+                type: new GraphQLList(qlTypes.modifier),
+                resolve: async () => await models.Modifier.findAll({})
             }
         })
     }),
@@ -167,6 +171,17 @@ const schema = new GraphQLSchema({
                         name: args.name,
                         description: args.description,
                         effectId: args.effectId
+                })
+            },
+            addModifier: {
+                type: qlTypes.modifier,
+                args: {
+                    amount: { type: new GraphQLNonNull(GraphQLInt) },
+                    keywordId: { type: GraphQLInt }
+                },
+                resolve: async (_, args) => await models.Modifier.create({
+                        amount: args.amount,
+                        keywordId: args.keywordId
                 })
             }
         })
