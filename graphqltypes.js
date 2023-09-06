@@ -26,7 +26,6 @@ const user = new GraphQLObjectType({
     })
 });
 
-
 const character = new GraphQLObjectType({
     name: 'character',
     fields: () => ({
@@ -95,7 +94,21 @@ const effect = new GraphQLObjectType({
     })
 });
 
+const item = new GraphQLObjectType({
+    name: 'item',
+    fields: () => ({
+        id: { type: GraphQLInt },
+        name: { type: GraphQLString },
+        description: { type: GraphQLString },
+        effect: {
+            type: effect,
+            resolve: async item => await (await models.Item.findByPk(item.id)).getEffect()
+        }
+    })
+})
+
 module.exports = {
     user, character, storylet,
-    keyword, affect, effect
+    keyword, affect, effect,
+    item
 }

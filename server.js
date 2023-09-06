@@ -19,6 +19,7 @@ const app = express();
 const EXPRESS_PORT = 5000;
 
 const schema = new GraphQLSchema({
+
     query: new GraphQLObjectType({
         name: 'rootQuery',
         fields: () => ({
@@ -45,9 +46,14 @@ const schema = new GraphQLSchema({
             effects: {
                 type: new GraphQLList(qlTypes.effect),
                 resolve: async () => await models.Effect.findAll({})
+            },
+            items: {
+                type: new GraphQLList(qlTypes.item),
+                resolve: async () => await models.Item.findAll({})
             }
         })
     }),
+
     mutation: new GraphQLObjectType({
         name: 'rootMutation',
         fields: () => ({
@@ -149,6 +155,19 @@ const schema = new GraphQLSchema({
 
                     return effect;
                 }
+            },
+            addItem: {
+                type: qlTypes.item,
+                args: {
+                    name: { type: new GraphQLNonNull(GraphQLString) },
+                    description: { type: new GraphQLNonNull(GraphQLString) },
+                    effectId: { type: GraphQLInt }
+                },
+                resolve: async (_, args) => await models.Item.create({
+                        name: args.name,
+                        description: args.description,
+                        effectId: args.effectId
+                })
             }
         })
     })
