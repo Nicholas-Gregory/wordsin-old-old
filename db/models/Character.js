@@ -114,6 +114,7 @@ Character.init({
     },
     level: {
         type: DataTypes.INTEGER,
+        defaultValue: 1,
         validate: {
             min: 1
         }
