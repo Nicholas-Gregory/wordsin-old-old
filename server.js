@@ -38,9 +38,13 @@ const schema = new GraphQLSchema({
                 type: new GraphQLList(qlTypes.keyword),
                 resolve: async () => await models.Keyword.findAll({})
             },
-            affect: {
+            affects: {
                 type: new GraphQLList(qlTypes.affect),
                 resolve: async () => await models.Affect.findAll({})
+            },
+            effects: {
+                type: new GraphQLList(qlTypes.effect),
+                resolve: async () => await models.Effect.findAll({})
             }
         })
     }),
@@ -70,6 +74,81 @@ const schema = new GraphQLSchema({
                         name: args.name,
                         userId: args.userId
                 })
+            },
+            addStorylet: {
+                type: qlTypes.storylet,
+                args: {
+                    body: { type: new GraphQLNonNull(GraphQLString) }
+                },
+                resolve: async (_, args) => await models.Storylet.create({
+                    body: args.body
+                })
+            },
+            addKeyword: {
+                type: qlTypes.keyword,
+                args: {
+                    word: { type: new GraphQLNonNull(GraphQLString) }
+                },
+                resolve: async (_, args) => await models.Keyword.create({
+                    word: args.word
+                })
+            },
+            addAffect: {
+                type: qlTypes.affect,
+                args: {
+                    requirement: { type: new GraphQLNonNull(GraphQLInt) },
+                    keywordId: { type: new GraphQLNonNull(GraphQLInt) }
+                },
+                resolve: async (_, args) => await models.Affect.create({
+                    keywordId: args.keywordId,
+                    requirement: args.requirement
+                })
+            },
+            linkStorylets: {
+                type: GraphQLString,
+                args: {
+                    first: { type: new GraphQLNonNull(GraphQLInt) },
+                    second: { type: new GraphQLNonNull(GraphQLInt) },
+                    affects: { type: new GraphQLNonNull(new GraphQLList(GraphQLInt))}
+                },
+                resolve: async (_, args) => {
+                    const link = await models.NextStorylet.create({
+                        first: args.first,
+                        second: args.second
+                    });
+
+                    await models.AffectToAdvance.bulkCreate(args.affects.map(affect => ({
+                        next: link.id,
+                        affectId: affect
+                    })));
+
+                    return "Storylets linked"
+                }
+            },
+            addEffect: {
+                type: qlTypes.effect,
+                args: {
+                    ceil: { type: new GraphQLNonNull(GraphQLInt) },
+                    time: { type: new GraphQLNonNull(GraphQLInt) },
+                    keywordIds: { type: new GraphQLNonNull(new GraphQLList(GraphQLInt)) }
+                },
+                resolve: async (_, args) => {
+                    const effect = await models.Effect.create({
+                        ceil: args.ceil,
+                        time: args.time
+                    });
+
+                    await models.EffectWord.bulkCreate(
+                        args.keywordIds.map(
+                            id => ({
+                                effectId: effect.id,
+                                keywordId: id
+                            })
+                        )
+                    );
+
+                    return effect;
+                }
             }
         })
     })
@@ -81,20 +160,5 @@ app.use('/api', graphqlHTTP({
 }));
 
 sequelize.sync({ force: true }).then(async () => {
-    const keyword = await models.Keyword.create({
-        word: 'open'
-    })
-    const affect = await models.Affect.create({
-        requirement: 1
-    });
-    affect.associateKeyword(keyword);
-    const storylet1 = await models.Storylet.create({
-        body: "You see a chair"
-    });
-    const storylet2 = await models.Storylet.create({
-        body: "The chair is red"
-    });
-    await storylet1.link(storylet2, [affect]);
-
     app.listen(EXPRESS_PORT, () => console.log(`Express server listening on port ${EXPRESS_PORT}`));
 });

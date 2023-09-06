@@ -82,7 +82,20 @@ const affect = new GraphQLObjectType({
     })
 });
 
+const effect = new GraphQLObjectType({
+    name: 'effect',
+    fields: () => ({
+        id: { type: GraphQLInt },
+        ceil: { type: GraphQLInt },
+        time: { type: GraphQLInt },
+        keywords: {
+            type: new GraphQLList(keyword),
+            resolve: async effect => await (await models.Effect.findByPk(effect.id)).getKeywords()
+        }
+    })
+});
+
 module.exports = {
     user, character, storylet,
-    keyword, affect
+    keyword, affect, effect
 }

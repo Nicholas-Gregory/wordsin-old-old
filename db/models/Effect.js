@@ -23,12 +23,14 @@ Effect.init({
     },
     ceil: {
         type: DataTypes.INTEGER,
+        allowNull: false,
         validate: {
             min: 1
         }
     },
     time: {
         type: DataTypes.INTEGER,
+        allowNull: false,
         validate: {
             min: 1
         }
