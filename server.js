@@ -207,7 +207,7 @@ const schema = new GraphQLSchema({
                     description: { type: new GraphQLNonNull(GraphQLString) },
                     type: { type: GraphQLString },
                     effectId: { type: GraphQLInt },
-                    modifiers: { type: new GraphQLList(GraphQLInt) }
+                    modifierIds: { type: new GraphQLList(GraphQLInt) }
                 },
                 resolve: async (_, args) => {
                     const equipment = await models.Equipment.create({
@@ -217,11 +217,10 @@ const schema = new GraphQLSchema({
                         effectId: args.effectId
                     });
 
-                    for (let id of args.modifiers) {
-                        await models.EquipmentHasModifier.create({
-                            equipmentId: equipment.id,
-                            modifierId: id
-                        });
+                    for (let id of args.modifierIds) {
+                        const modifier = await models.Modifier.findByPk(id);
+
+                        await equipment.addModifier(modifier);
                     }
 
                     return equipment;
