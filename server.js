@@ -121,10 +121,17 @@ const schema = new GraphQLSchema({
                     requirement: { type: new GraphQLNonNull(GraphQLInt) },
                     keywordId: { type: new GraphQLNonNull(GraphQLInt) }
                 },
-                resolve: async (_, args) => await models.Affect.create({
-                    keywordId: args.keywordId,
-                    requirement: args.requirement
-                })
+                resolve: async (_, args) => {
+                    const affect = await models.Affect.create({
+                        keywordId: args.keywordId,
+                        requirement: args.requirement
+                    });
+                    const keyword = await models.Keyword.findByPk(args.keywordId);
+
+                    await affect.associateKeyword(keyword);
+
+                    return affect;
+                }
             },
             linkStorylets: {
                 type: GraphQLString,
