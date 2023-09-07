@@ -20,7 +20,8 @@ const keywordWords = [
     'smell',
     'see',
     'taste',
-    'feel'
+    'feel',
+    'think'
 ];
 
 module.exports = {

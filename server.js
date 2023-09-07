@@ -100,9 +100,11 @@ const schema = new GraphQLSchema({
             addStorylet: {
                 type: qlTypes.storylet,
                 args: {
+                    title: { type: new GraphQLNonNull(GraphQLString) },
                     body: { type: new GraphQLNonNull(GraphQLString) }
                 },
                 resolve: async (_, args) => await models.Storylet.create({
+                    title: args.title,
                     body: args.body
                 })
             },

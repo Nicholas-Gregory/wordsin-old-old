@@ -48,6 +48,10 @@ Storylet.init({
         unique: true,
         allowNull: false
     },
+    title: {
+        type: DataTypes.STRING,
+        unique: true
+    },
     body: {
         type: DataTypes.TEXT,
         allowNull: false

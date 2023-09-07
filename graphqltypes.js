@@ -49,6 +49,7 @@ const storylet = new GraphQLObjectType({
     name: 'storylet',
     fields: () => ({
         id: { type: GraphQLInt },
+        title: { type: GraphQLString },
         body: { type: GraphQLString },
         next: {
             type: new GraphQLList(storylet),
