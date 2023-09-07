@@ -201,10 +201,16 @@ const schema = new GraphQLSchema({
                     amount: { type: new GraphQLNonNull(GraphQLInt) },
                     keywordId: { type: GraphQLInt }
                 },
-                resolve: async (_, args) => await models.Modifier.create({
-                        amount: args.amount,
-                        keywordId: args.keywordId
-                })
+                resolve: async (_, args) => {
+                    const modifier = await models.Modifier.create({
+                        amount: args.amount,                        
+                    });
+                    const keyword = await models.Keyword.findByPk(args.keywordId);
+
+                    await modifier.associateKeyword(keyword);
+
+                    return modifier;
+                }
             },
             addEquipment: {
                 type: qlTypes.equipment,
