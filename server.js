@@ -183,11 +183,17 @@ const schema = new GraphQLSchema({
                     description: { type: new GraphQLNonNull(GraphQLString) },
                     effectId: { type: GraphQLInt }
                 },
-                resolve: async (_, args) => await models.Item.create({
+                resolve: async (_, args) => {
+                    const item = await models.Item.create({
                         name: args.name,
                         description: args.description,
-                        effectId: args.effectId
-                })
+                    });
+                    const effect = await models.Effect.findByPk(args.effectId)
+
+                    await item.associateEffect(effect);
+
+                    return item;
+                } 
             },
             addModifier: {
                 type: qlTypes.modifier,
