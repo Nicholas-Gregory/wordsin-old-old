@@ -167,14 +167,11 @@ const schema = new GraphQLSchema({
                         time: args.time
                     });
 
-                    await models.EffectWord.bulkCreate(
-                        args.keywordIds.map(
-                            id => ({
-                                effectId: effect.id,
-                                keywordId: id
-                            })
-                        )
-                    );
+                    for (let id of args.keywordIds) {
+                        let keyword = await models.Keyword.findByPk(id);
+
+                        await effect.addKeyword(keyword);
+                    }
 
                     return effect;
                 }
