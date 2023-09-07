@@ -56,7 +56,9 @@ class World extends Model {
 
         for (let affect of affects) {
             if (affect.requirement <= result.amount &&
-                keywords.find(keyword => resultKeywords.includes(keyword.word))) {
+                keywords
+                .find(keyword => resultKeywords
+                    .includes(keyword.word))) {
                     return affect;
             }
         }
@@ -66,7 +68,9 @@ class World extends Model {
         const currentStorylet = await this.getStorylet();
         const activeLinks = await this.activeLinks(currentStorylet);        
         const affectLinks = await affect.getNextStorylets();
-        const link = activeLinks.find(link => affectLinks.find(aLink => aLink.id === link.id));
+        const link = activeLinks
+        .find(link => affectLinks
+            .find(aLink => aLink.id === link.id));
         
         if (link) {
             this.currentStorylet = link.second;

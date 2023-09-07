@@ -138,18 +138,27 @@ const schema = new GraphQLSchema({
                 args: {
                     first: { type: new GraphQLNonNull(GraphQLInt) },
                     second: { type: new GraphQLNonNull(GraphQLInt) },
-                    affects: { type: new GraphQLNonNull(new GraphQLList(GraphQLInt))}
+                    affectIds: { type: new GraphQLNonNull(new GraphQLList(GraphQLInt))}
                 },
                 resolve: async (_, args) => {
-                    const link = await models.NextStorylet.create({
-                        first: args.first,
-                        second: args.second
-                    });
+                    // const link = await models.NextStorylet.create({
+                    //     first: args.first,
+                    //     second: args.second
+                    // });
 
-                    await models.AffectToAdvance.bulkCreate(args.affects.map(affect => ({
-                        next: link.id,
-                        affectId: affect
-                    })));
+                    // await models.AffectToAdvance.bulkCreate(args.affects.map(affect => ({
+                    //     next: link.id,
+                    //     affectId: affect
+                    // })));
+
+                    const first = await models.Storylet.findByPk(args.first);
+                    const second = await models.Storylet.findByPk(args.second);
+                    const affects = await Promise.all(
+                        args.affectIds
+                        .map(async id => await models.Affect.findByPk(id))
+                    );
+
+                    await first.link(second, affects);
 
                     return "Storylets linked"
                 }
