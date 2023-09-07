@@ -141,16 +141,6 @@ const schema = new GraphQLSchema({
                     affectIds: { type: new GraphQLNonNull(new GraphQLList(GraphQLInt))}
                 },
                 resolve: async (_, args) => {
-                    // const link = await models.NextStorylet.create({
-                    //     first: args.first,
-                    //     second: args.second
-                    // });
-
-                    // await models.AffectToAdvance.bulkCreate(args.affects.map(affect => ({
-                    //     next: link.id,
-                    //     affectId: affect
-                    // })));
-
                     const first = await models.Storylet.findByPk(args.first);
                     const second = await models.Storylet.findByPk(args.second);
                     const affects = await Promise.all(
@@ -257,5 +247,6 @@ app.use('/api', graphqlHTTP({
 }));
 
 sequelize.sync({ force: true }).then(async () => {
+    require('./tutorialdata');
     app.listen(EXPRESS_PORT, () => console.log(`Express server listening on port ${EXPRESS_PORT}`));
 });

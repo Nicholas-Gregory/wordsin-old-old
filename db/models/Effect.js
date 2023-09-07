@@ -2,6 +2,7 @@ const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../connection');
 
 const EffectWord = require('./EffectWord');
+const Keyword = require('./Keyword');
 
 class Effect extends Model {
     
@@ -10,6 +11,12 @@ class Effect extends Model {
             effectId: this.id,
             keywordId: keyword.id
         });
+    }
+
+    async addKeywordByWord(word) {
+        await this.addKeyword(await Keyword.findOne({
+            where: { word }
+        }));
     }
 }
 
