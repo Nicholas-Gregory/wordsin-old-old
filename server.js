@@ -85,11 +85,17 @@ const schema = new GraphQLSchema({
                     level: { type: GraphQLInt },
                     userId: { type: GraphQLInt }
                 },
-                resolve: async (_, args) => await models.Character.create({
+                resolve: async (_, args) => {
+                    const character = await models.Character.create({
                         name: args.name,
                         userId: args.userId,
                         level: args.level
-                })
+                    });
+
+                    await character.initInventories();
+
+                    return character;
+                }
             },
             addStorylet: {
                 type: qlTypes.storylet,
