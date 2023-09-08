@@ -66,7 +66,15 @@ const keyword = new GraphQLObjectType({
     name: 'keyword',
     fields: () => ({
         id: { type: GraphQLInt },
-        word: { type: GraphQLString }
+        word: { type: GraphQLString },
+        affects: {
+            type: new GraphQLList(affect),
+            resolve: async keyword => await models.Affect.findAll({
+                where: {
+                    keywordId: keyword.id
+                }
+            })
+        }
     })
 });
 

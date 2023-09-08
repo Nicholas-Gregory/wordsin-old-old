@@ -13,7 +13,7 @@ export default function AffectKeywordSearch() {
         setResults((await graphQLQuery(`
         query AffectsByKeyword($word: String!) {
             affectsByKeyword(word: $word) {
-                requirement
+                requirement, id
             }
         }
         `, { word: keyword })).data.affectsByKeyword);
