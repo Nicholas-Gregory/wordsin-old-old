@@ -39,6 +39,17 @@ const schema = new GraphQLSchema({
                 type: new GraphQLList(qlTypes.keyword),
                 resolve: async () => await models.Keyword.findAll({})
             },
+            keywordByWord: {
+                type: qlTypes.keyword,
+                args: {
+                    word: { type: new GraphQLNonNull(GraphQLString) }
+                },
+                resolve: async (_, args) => await models.Keyword.findOne({
+                    where: {
+                        word: args.word
+                    }
+                })
+            },
             affects: {
                 type: new GraphQLList(qlTypes.affect),
                 resolve: async () => await models.Affect.findAll({})
