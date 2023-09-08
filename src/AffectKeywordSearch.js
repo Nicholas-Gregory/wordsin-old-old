@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { graphQLQuery } from './utils';
 
-export default function EffectKeywordSearch({ select, type }) {
+export default function AffectKeywordSearch() {
     const keywordRef = useRef(null);
     const [results, setResults] = useState([]);
 
@@ -11,27 +11,19 @@ export default function EffectKeywordSearch({ select, type }) {
         const keyword = keywordRef.current.value;
 
         setResults((await graphQLQuery(`
-        query EffectsByKeyword($word: String!) {
-            effectsByKeyword(word: $word) {
-                id,
-                ceil,
-                time
+        query AffectsByKeyword($word: String!) {
+            affectsByKeyword(word: $word) {
+                requirement
             }
-        }`, { "word" : keyword })).data.effectsByKeyword);
-            console.log(results);
-    }
-
-    function resultClickHandler(e) {
-        e.preventDefault();
-
-        select(e.target.dataset.id);
+        }
+        `, { word: keyword })).data.affectsByKeyword);
     }
 
     return (
         <>
             <form onSubmit={handleSubmit}>
-                <input 
-                    type="text" 
+                <input
+                    type='text'
                     placeholder='Keyword Search'
                     ref={keywordRef}
                 ></input>
@@ -39,13 +31,10 @@ export default function EffectKeywordSearch({ select, type }) {
             </form>
 
             <ul>
-                {results.map(effect => 
-                    <li key={effect.id}>
+                {results.map(affect =>
+                    <li key={affect.id}>
                         <p>
-                            Ceil: {effect.ceil}
-                        </p>
-                        <p>
-                            Time: {effect.time}
+                            Requirement: {affect.requirement}
                         </p>
                     </li>
                 )}

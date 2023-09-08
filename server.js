@@ -83,6 +83,25 @@ const schema = new GraphQLSchema({
 
                     return effects;
                 }
+            },
+            affectsByKeyword: {
+                type: new GraphQLList(qlTypes.affect),
+                args: {
+                    word: { type: new GraphQLNonNull(GraphQLString) }
+                },
+                resolve: async (_, args) => {
+                    const keyword = await models.Keyword.findOne({
+                        where: {
+                            word: args.word
+                        }
+                    });
+
+                    return await models.Affect.findAll({
+                        where: {
+                            keywordId: keyword.id
+                        }
+                    });
+                }
             }
         })
     }),
