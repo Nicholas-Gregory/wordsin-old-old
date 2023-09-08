@@ -74,6 +74,10 @@ const keyword = new GraphQLObjectType({
                     keywordId: keyword.id
                 }
             })
+        },
+        effects: {
+            type: new GraphQLList(effect),
+            resolve: async keyword => (await models.Keyword.findByPk(keyword.id)).getEffects()
         }
     })
 });
