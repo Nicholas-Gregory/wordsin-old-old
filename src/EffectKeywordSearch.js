@@ -12,13 +12,12 @@ export default function EffectKeywordSearch({ select, type }) {
 
         setResults((await graphQLQuery(`
         query EffectsByKeyword($word: String!) {
-            effectsByKeyword(word: $word) {
-                id,
-                ceil,
-                time
+            keywordByWord(word: $word) {
+                effects {
+                    id, ceil, time
+                }
             }
-        }`, { "word" : keyword })).data.effectsByKeyword);
-            console.log(results);
+        }`, { "word" : keyword })).data.keywordByWord.effects);
     }
 
     function resultClickHandler(e) {

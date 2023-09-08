@@ -6,7 +6,7 @@ import AffectKeywordSearch from './AffectKeywordSearch';
 function App() {
   return (
     <>
-      <AffectKeywordSearch />
+      <EffectKeywordSearch />
     </>
   );
 }
