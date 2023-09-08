@@ -58,6 +58,31 @@ const schema = new GraphQLSchema({
             equipment: {
                 type: new GraphQLList(qlTypes.equipment),
                 resolve: async () => await models.Equipment.findAll({})
+            },
+            effectsByKeyword: {
+                type: new GraphQLList(qlTypes.effect),
+                args: {
+                    word: { type: new GraphQLNonNull(GraphQLString) }
+                },
+                resolve: async (_, args) => {
+                    const keyword = await models.Keyword.findOne({
+                        where: {
+                            word: args.word
+                        }
+                    });
+                    const throughEntries = await models.EffectWord.findAll({
+                        where: {
+                            keywordId: keyword.id
+                        }
+                    });
+                    const effects = [];
+
+                    for (let through of throughEntries) {
+                        effects.push(await models.Effect.findByPk(through.effectId));
+                    }
+
+                    return effects;
+                }
             }
         })
     }),
