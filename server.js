@@ -35,6 +35,17 @@ const schema = new GraphQLSchema({
                 type: new GraphQLList(qlTypes.storylet),
                 resolve: async () => await models.Storylet.findAll({})
             },
+            storyletByTitle: {
+                type: qlTypes.storylet,
+                args: {
+                    title: { type: new GraphQLNonNull(GraphQLString) }
+                },
+                resolve: async (_, args) => await models.Storylet.findOne({
+                    where: {
+                        title: args.title
+                    }
+                })
+            },
             keywords: {
                 type: new GraphQLList(qlTypes.keyword),
                 resolve: async () => await models.Keyword.findAll({})
