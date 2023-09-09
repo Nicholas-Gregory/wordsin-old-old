@@ -12,11 +12,13 @@ export default function AffectKeywordSearch() {
 
         setResults((await graphQLQuery(`
         query AffectsByKeyword($word: String!) {
-            affectsByKeyword(word: $word) {
-                requirement, id
+            keywordByWord(word: $word) {
+                affects {
+                    requirement, id
+                }
             }
         }
-        `, { word: keyword })).data.affectsByKeyword);
+        `, { word: keyword })).data.keywordByWord.affects);
     }
 
     return (
