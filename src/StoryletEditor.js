@@ -5,6 +5,7 @@ import { graphQLQuery } from './utils';
 export default function StoryletEditor() {
     const [currentStorylet, setCurrentStorylet] = useState(null);
     const [editing, setEditing] = useState(false);
+    const [editingNextOrPrev, setEditingNextOrPrev] = useState(null);
 
     const titleRef = useRef();
     const bodyRef = useRef();
@@ -49,7 +50,7 @@ export default function StoryletEditor() {
 
         console.log(currentStorylet);
 
-        const storylet = (await graphQLQuery(`
+        const response = (await graphQLQuery(`
             mutation EditStorylet($id: Int!, $title: String, $body: String) {
                 editStorylet(id: $id, title: $title, body: $body) {
                     id, title, body,
@@ -58,6 +59,9 @@ export default function StoryletEditor() {
                     },
                     previous {
                         id, title
+                    },
+                    next {
+                        id, title
                     }
                 }
             }
@@ -65,11 +69,91 @@ export default function StoryletEditor() {
             id: currentStorylet.id, 
             title: titleRef.current.textContent,
             body: bodyRef.current.textContent
-        })).data.editStorylet;
+        })).data;
+
+        let storylet;
+
+        if (response) {
+            storylet = response.editStorylet;
+        } else {
+            storylet = (await graphQLQuery(`
+            mutation AddStorylet($title: String!, $body: String!) {
+                addStorylet(title: $title, body: $body) {
+                    id, title, body
+                }
+            }`, {
+                title: titleRef.current.textContent,
+                body: bodyRef.current.textContent
+            })).data.addStorylet;
+
+            const affectIds = window.prompt("Enter affect IDs, separated by spaces")
+            .split(' ')
+            .map(v => Number(v));
+
+            if (editingNextOrPrev === 'next') {
+                await graphQLQuery(`
+                mutation NewNext($first: Int!, $second: Int!, $affectIds: [Int]!) {
+                    linkStorylets(first: $first, second: $second, affectIds: $affectIds)
+                }
+                `, {
+                    first: currentStorylet.previous[0].id,
+                    second: storylet.id,
+                    affectIds
+                });
+            } else if (editingNextOrPrev === 'prev') {
+                await graphQLQuery(`
+                mutation NewPrevious($first: Int!, $second: Int!, $affectIds: [Int]!) {
+                    linkStorylets(first: $first, second: $second, affectIds: $affectIds)
+                }
+                `, {
+                    first: storylet.id,
+                    second: currentStorylet.next[0].id,
+                    affectIds
+                })
+            }
+        }
+
+        storylet = (await graphQLQuery(`
+        query Storylet($title: String!) {
+            storyletByTitle(title: $title) {
+                id, title, body
+                previous {
+                    id, title
+                },
+                next {
+                    id, title
+                }
+            }
+        }
+        `, { title: storylet.title })).data.storyletByTitle;
 
         setCurrentStorylet(storylet);
 
         setEditing(false);
+    }
+
+    async function clickNewPrevious(e) {
+        e.preventDefault();
+
+        setCurrentStorylet({
+            next: [{id: currentStorylet.id, title: currentStorylet.title}],
+            title: '',
+            body: ''
+        });
+        
+        setEditingNextOrPrev('prev');
+    }
+
+    async function clickNewNext(e) {
+        e.preventDefault();
+
+        setCurrentStorylet({
+            previous: [{id: currentStorylet.id, title: currentStorylet.title}],
+            title: '',
+            body: ''
+        });
+
+        setEditingNextOrPrev('next');
     }
 
     return (
@@ -89,6 +173,7 @@ export default function StoryletEditor() {
                             </li>                
                         )}
                     </ul>
+                    {!editing && <button onClick={clickNewPrevious}>New</button>}
                     <p>
                         Storylet:
                     </p>
@@ -123,6 +208,7 @@ export default function StoryletEditor() {
                             </li>                
                         )}
                     </ul>
+                    {!editing && <button onClick={clickNewNext}>New</button>}
                 </div>
             }
         </>
