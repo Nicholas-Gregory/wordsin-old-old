@@ -1,10 +1,10 @@
 import React from 'react';
 
-export default function StoryletCard({ storylet }) {
+export default function StoryletCard({ title }) {
     return (
         <>
             <div>
-                {storylet.title}
+                {title}
             </div>
         </>
     )
