@@ -1,41 +1,24 @@
 import React, { useRef } from 'react';
+import StoryletViewer from './StoryletViewer';
+import StoryletCard from './StoryletCard';
+import StoryletCardList from './StoryletCardList';
 
-export default function StoryletEditor() {
-    const titleRef = useRef(null);
-    const bodyRef = useRef(null);
-
-    async function handleSubmit(e) {
-        e.preventDefault();
-
-        const title = titleRef.current.value;
-        const body = bodyRef.current.value;
-
-        await fetch('/api', {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json"
-            },
-            body: JSON.stringify({
-                query: `
-                    mutation NewStorylet($title: String!, $body: String!) {
-                        addStorylet(title: $title, body: $body) {
-                            id
-                        }
-                    }
-                `,
-                variables: {
-                    title, body
-                }
-            })
-        });
-    }
+export default function StoryletEditor({ storyletData }) {
 
     return (
         <>
-           <textarea ref={titleRef} placeholder='title'></textarea>
-           <textarea ref={bodyRef} placeholder='body'></textarea>
-           <button onClick={handleSubmit}>Submit</button>
+            <p>
+                Previous:
+            </p>
+            <StoryletCardList storyletList={storyletData.previous} />
+            <p>
+                Storylet:
+            </p>
+            <StoryletViewer storylet={storyletData}/>
+            <p>
+                Next:
+            </p>
+            <StoryletCardList storyletList={storyletData.next} />
         </>
     );
 }

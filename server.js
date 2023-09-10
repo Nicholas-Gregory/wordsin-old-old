@@ -130,6 +130,23 @@ const schema = new GraphQLSchema({
                     body: args.body
                 })
             },
+            editStorylet: {
+                type: qlTypes.storylet,
+                args: {
+                    id: { type: new GraphQLNonNull(GraphQLInt) },
+                    title: { type: GraphQLString },
+                    body: { type: GraphQLString }
+                },
+                resolve: async (_, args) => {
+                    const storylet = await models.Storylet.findByPk(args.id);
+                    
+                    storylet.body = args.body || storylet.body;
+                    storylet.title = args.title || storylet.title;
+                    await storylet.save();
+
+                    return storylet;
+                }
+            },
             addKeyword: {
                 type: qlTypes.keyword,
                 args: {

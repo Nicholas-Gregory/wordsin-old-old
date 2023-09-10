@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import StoryletViewer from './StoryletViewer';
-import StoryletCard from './StoryletCard';
 import { graphQLQuery } from './utils';
+import StoryletEditor from './StoryletEditor';
 
 function App() {
-  const [storyletData, setStoryletData] = useState({});
+  const [storyletData, setStoryletData] = useState(null);
 
   async function clickHandler() {
       const response = await graphQLQuery(`{
         storyletByTitle(title: "title 2") {
-          title, body,
+          title, body, id
           next {
             id, title
           },
@@ -24,27 +23,7 @@ function App() {
 
   return (
     <>
-      <p>
-        Previous:
-      </p>
-      <ul>
-            {(storyletData.previous || []).map(storylet => 
-                <li key={storylet.id}>
-                    <StoryletCard storylet={storylet} />
-                </li>
-            )}
-        </ul>
-      <StoryletViewer storylet={storyletData}/>
-      <p>
-        Next:
-      </p>
-      <ul>
-            {(storyletData.next || []).map(storylet => 
-                <li key={storylet.id}>
-                    <StoryletCard storylet={storylet} />
-                </li>
-            )}
-        </ul>
+      {storyletData && <StoryletEditor storyletData={storyletData} />}
       <button onClick={clickHandler}>Load Data</button>
     </>
   );
